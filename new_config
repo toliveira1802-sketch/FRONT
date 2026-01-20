@@ -1,6 +1,21 @@
 # Add the new configuration files
 git add package.json vite.config.ts tsconfig.json tsconfig.node.json index.html tailwind.config.js postcss.config.js start.sh .gitignore
 
+buildctl build \
+  --local context=/path/to/app/to/build \
+  --local dockerfile=/path/to/dir/containing/railpack-plan.json \
+  --frontend=gateway.v0 \
+  --opt source=ghcr.io/railwayapp/railpack:railpack-frontend \
+  --output type=docker,name=test
+
+buildctl build \
+  --local context=/path/to/app/to/build \
+  --local dockerfile=/path/to/dir/containing/railpack-plan.json \
+  --frontend=gateway.v0 \
+  --opt source=ghcr.io/railwayapp/railpack:railpack-frontend \
+  --secret id=STRIPE_LIVE_KEY,env=STRIPE_LIVE_KEY \
+  --output type=docker,name=test
+
 # Commit and push the changes
 git commit -m "Add missing Vite/React configuration and start.sh for Railpack"
 git push origin main
