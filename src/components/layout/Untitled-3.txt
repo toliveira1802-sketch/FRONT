@@ -1,0 +1,6 @@
+git add .
+git commit -m "Fix: Ajustes finais de TypeScript e Dashboard"
+git push
+
+git status
+pnpm lint --fix

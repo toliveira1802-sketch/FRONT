@@ -1,0 +1,206 @@
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { Header } from '@/components/layout/Header'
+import { BottomNavigation } from '@/components/layout/BottomNavigation'
+import { AppSidebar } from '@/components/layout/AppSidebar'
+import { Loader2 } from 'lucide-react'
+
+// Client Pages
+import Login from '@/pages/Login'
+import Register from '@/pages/Register'
+import Home from '@/pages/Home'
+import Agenda from '@/pages/Agenda'
+import Profile from '@/pages/Profile'
+import NovoAgendamento from '@/pages/NovoAgendamento'
+import AgendamentoSucesso from '@/pages/AgendamentoSucesso'
+import Avisos from '@/pages/Avisos'
+
+// Admin Pages
+import AdminDashboard from '@/pages/admin/Dashboard'
+import Patio from '@/pages/admin/Patio'
+import Clientes from '@/pages/admin/Clientes'
+import OrdensServico from '@/pages/admin/OrdensServico'
+import NovaOS from '@/pages/admin/NovaOS'
+import Servicos from '@/pages/admin/Servicos'
+
+// Protected Route wrapper
+function ProtectedRoute({ children, requiredRoles }: { children: React.ReactNode; requiredRoles?: string[] }) {
+    const { isAuthenticated, isLoading, role } = useAuth()
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />
+    }
+
+    if (requiredRoles && role && !requiredRoles.includes(role)) {
+        return <Navigate to="/" replace />
+    }
+
+    return <>{children}</>
+}
+
+// Client Layout
+function ClientLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="min-h-screen bg-background">
+            <Header showMenu={false} />
+            <main className="container max-w-2xl mx-auto p-4">
+                {children}
+            </main>
+            <BottomNavigation />
+        </div>
+    )
+}
+
+// Admin Layout
+function AdminLayout({ children }: { children: React.ReactNode }) {
+    const [sidebarOpen, setSidebarOpen] = useState(true)
+
+    return (
+        <div className="min-h-screen bg-background">
+            <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+            <div className="flex">
+                <AppSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+                <main className={`flex-1 p-6 transition-all duration-300 ${sidebarOpen ? 'lg:ml-0' : ''}`}>
+                    {children}
+                </main>
+            </div>
+        </div>
+    )
+}
+
+export default function App() {
+    const { isAuthenticated, isLoading } = useAuth()
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+
+    return (
+        <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
+            <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" replace />} />
+
+            {/* Client Routes */}
+            <Route path="/" element={
+                <ProtectedRoute>
+                    <ClientLayout><Home /></ClientLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/agenda" element={
+                <ProtectedRoute>
+                    <ClientLayout><Agenda /></ClientLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+                <ProtectedRoute>
+                    <ClientLayout><Profile /></ClientLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/avisos" element={
+                <ProtectedRoute>
+                    <ClientLayout><Avisos /></ClientLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/novo-agendamento" element={
+                <ProtectedRoute>
+                    <ClientLayout><NovoAgendamento /></ClientLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/agendamento-sucesso" element={
+                <ProtectedRoute>
+                    <ClientLayout><AgendamentoSucesso /></ClientLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/historico" element={
+                <ProtectedRoute>
+                    <ClientLayout>
+                        <div className="text-center py-12 text-muted-foreground">
+                            <p>Histórico - Em desenvolvimento</p>
+                        </div>
+                    </ClientLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/veiculo/:id" element={
+                <ProtectedRoute>
+                    <ClientLayout>
+                        <div className="text-center py-12 text-muted-foreground">
+                            <p>Detalhes do Veículo - Em desenvolvimento</p>
+                        </div>
+                    </ClientLayout>
+                </ProtectedRoute>
+            } />
+
+            {/* Gestão Routes */}
+            <Route path="/gestao" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout><AdminDashboard /></AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/agendamentos" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout><Agenda isAdmin /></AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/patio" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout><Patio /></AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/clientes" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout><Clientes /></AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/ordens-servico" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout><OrdensServico /></AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/nova-os" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout><NovaOS /></AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/servicos" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout><Servicos /></AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/financeiro" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout>
+                        <div className="text-center py-12 text-muted-foreground">
+                            <p>Financeiro - Em desenvolvimento</p>
+                        </div>
+                    </AdminLayout>
+                </ProtectedRoute>
+            } />
+            <Route path="/gestao/configuracoes" element={
+                <ProtectedRoute requiredRoles={['gestao', 'dev']}>
+                    <AdminLayout>
+                        <div className="text-center py-12 text-muted-foreground">
+                            <p>Configurações - Em desenvolvimento</p>
+                        </div>
+                    </AdminLayout>
+                </ProtectedRoute>
+            } />
+
+            {/* Catch all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    )
+}

@@ -1,0 +1,47 @@
+import sys
+import os
+import time
+from dotenv import load_dotenv
+
+# 1. Teste de Vida Imediato
+print(">>> [SISTEMA] Iniciando Doctor Auto Prime...", flush=True)
+
+try:
+    # 2. Carregando Variáveis
+    print(">>> [SISTEMA] Carregando variáveis de ambiente...", flush=True)
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY")
+    
+    if not api_key:
+        print("!!! [ERRO] Chave API não encontrada no arquivo .env", flush=True)
+        # Não vou parar o código para testarmos a lógica, mas avisei.
+    else:
+        print(">>> [SUCESSO] Chave API detectada.", flush=True)
+
+    # 3. Simulação dos Agentes (Os Meninos)
+    print(">>> [SISTEMA] Acordando os consultores...", flush=True)
+    time.sleep(1) # Pausa dramática para simular carregamento
+
+    # Definição simples para testar se o Python tá rodando
+    def consultar_equipe(mensagem):
+        print(f"\n[CLIENTE]: {mensagem}")
+        print("...", flush=True)
+        time.sleep(1)
+        
+        # JOÃO - O Técnico (Foco em Mecânica/VW)
+        print(f"[JOÃO]: Thales, analisando aqui... Para Up TSI e Polo GTS, isso parece problema de pressão na turbina ou mapa muito agressivo.")
+        
+        time.sleep(1)
+        
+        # PEDRO - O Analista (Foco em Dados/CRM)
+        print(f"[PEDRO]: Complementando: O histórico desse cliente mostra que ele já fez Stage 2. Melhor agendar uma inspeção rápida para não perder o LTV.")
+
+    # 4. Execução Real
+    print(">>> [SISTEMA] Tudo pronto. Testando interação:", flush=True)
+    consultar_equipe("O carro tá falhando em alta, o que pode ser?")
+
+    print("\n>>> [FIM] Script finalizado com sucesso.", flush=True)
+
+except Exception as e:
+    print(f"\n!!! [CRASH] O código quebrou aqui: {e}", flush=True)
+    sys.exit(1)
